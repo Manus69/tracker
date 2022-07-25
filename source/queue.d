@@ -1,5 +1,8 @@
 module queue;
 
+import std.range;
+import std.format;
+
 struct Queue(T)
 {
     private ulong   size;

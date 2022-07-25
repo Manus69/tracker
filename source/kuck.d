@@ -15,6 +15,11 @@ private enum DATA_KEY = "data";
 
 class Kuck : Api
 {
+    override string GetRequestMessage() const
+    {
+        return super.GetMsg() ~ API;
+    }
+
     override string RequestAllPrices() const
     {
         return get(REQUEST).idup;

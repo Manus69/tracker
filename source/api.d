@@ -4,18 +4,17 @@ import binance;
 import kuck;
 import constants;
 
+enum string API_REQUEST_MESSAGE = "Requesting data from ";
+
 abstract class Api
 {
-    string          RequestAllPrices() const;
     string[string]  GetPriceTable() const;
+    string          RequestAllPrices() const;
+    string          GetRequestMessage() const;
+    
+    string          GetMsg() const
+    {
+        return API_REQUEST_MESSAGE;
+    }
 }
 
-Api GetApi(in string str)
-{
-    if (str == BINANCE_STR)
-        return new Binance();
-    if (str == KUCK_STR)
-        return new Kuck();
-
-    throw new Exception(ERROR_MSG_GENERIC);
-}

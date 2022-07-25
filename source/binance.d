@@ -9,6 +9,7 @@ import api;
 
 enum string BINANCE_STR = "Binance";
 enum string BINANCE_DSTR = DELIMITER_STR ~ BINANCE_STR;
+enum string BINANCE_BTCUSDT_STR = "BTCUSDT";
 private enum API = "https://api.binance.com/api/";
 private enum REQUEST = "https://api.binance.com/api/v3/ticker/price";
 private enum SEP = "},";
@@ -17,6 +18,11 @@ private enum PRICE_KEY = "price";
 
 class Binance : Api
 {
+    override string GetRequestMessage() const
+    {
+        return super.GetMsg() ~ API;
+    }
+    
     override string RequestAllPrices() const
     {
         return get(REQUEST).idup;

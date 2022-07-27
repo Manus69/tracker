@@ -12,7 +12,6 @@ void main(string[] args)
 {
 	Config config;
 	
-	// args = ["ass", "--file=test_file.txt"];
 	try
 	{
 		config = GetConfig(args);
@@ -23,5 +22,13 @@ void main(string[] args)
 		return DisplayHelp();
 	}
 
-	Run(config);
+	try
+	{
+		Run(config);
+	}
+	catch (Exception ex)
+	{
+		stderr.writeln(ex.msg);
+		stderr.writeln(ERROR_MSG_GENERIC);
+	}
 }

@@ -13,6 +13,11 @@ struct Queue(T)
         this.size = size;
     }
 
+    ulong Size() const pure @property
+    {
+        return size;
+    }
+
     bool FullCapacity() const pure @property
     {
         return values.length == size;

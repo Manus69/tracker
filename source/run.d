@@ -24,19 +24,23 @@ void ProcessTokens(Queue!double[string][string] queues,
     Api             api;
 
     api = cast(Api)config.apis[api_string];
-    // response_table = config.apis[api_string].GetPriceTable();
     response_table = api.GetPriceTable();
     writeln(api.GetRequestMessage());
+
+    // writeln(response_table);
+    // writeln(token_table);
 
     foreach (ref token; token_table[api_string])
     {
         if (token.name in response_table)
         {
-            // writeln(token.name, " ", response_table[token.name]);
+            // writefln("%s %s : %s", api_string, token.name, response_table[token.name]);
             (queues[api_string][token.name]).Push(to!double(response_table[token.name]));
         }
         else
+        {
             stderr.writeln(ERROR_MSG_TOKEN, token.name);
+        }
     }
 }
 
@@ -55,6 +59,26 @@ Queue!double[string][string] BuildQueues(in Token[][string] token_table, ulong s
     return queues;
 }
 
+void RebuildQueues(Queue!double[string][string] queues, in Token[][string] token_table)
+{
+    Queue!double[string] queue_table;
+
+    foreach (api_string; token_table.keys)
+    {
+        foreach (ref token; token_table[api_string])
+        {
+            if (api_string in queues && token.name in queues[api_string])
+            {
+                
+            }
+            else
+            {
+                queues[api_string][token.name] = Queue!double(queues[BINANCE_STR][BINANCE_BTCUSDT_STR].Size);
+            }
+        }
+    }
+}
+
 double ComputeDiff(double lhs, double rhs)
 {
     return ((rhs - lhs) / lhs) * 100;
@@ -67,14 +91,15 @@ bool CheckPriceCondition(in Queue!double[string][string] queues, in Token token,
     double price1;
     double diff;
 
+    if (!queues[api_name][token.name].FullCapacity())
+        return false;
+
     price0 = queues[api_name][token.name].Front();
     price1 = queues[api_name][token.name].Back();
     diff = ComputeDiff(price0 / btcusdt0, price1 / btcusdt1);
     
     if (api_name == BINANCE_STR && token.name == BINANCE_BTCUSDT_STR)
         diff = ComputeDiff(price1, price0);
-
-    // writefln("%s %s p: %s %s; b: %s %s", api_name, token.name, price0, price1, btcusdt0, btcusdt1);
 
     return diff > token.target_value;
 }
@@ -85,9 +110,6 @@ Token[] CheckQueues(in Queue!double[string][string] queues, in Token[][string] t
     double  btcusdt0;
     double  btcusdt1;
 
-    if (!queues[BINANCE_STR][BINANCE_BTCUSDT_STR].FullCapacity)
-        return [];
-    
     btcusdt0 = queues[BINANCE_STR][BINANCE_BTCUSDT_STR].Front();
     btcusdt1 = queues[BINANCE_STR][BINANCE_BTCUSDT_STR].Back();
     
@@ -115,8 +137,12 @@ void Run(Config config)
     while (true)
     {
         if (config.InputChanged)
+        {
             token_table = GetTokenTable(config);
+            RebuildQueues(queues, token_table);
+        }
         
+        // foreach (api_string; (token_table.keys))
         foreach (api_string; parallel(token_table.keys))
         {
             ProcessTokens(queues, token_table, config, api_string);

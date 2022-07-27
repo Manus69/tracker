@@ -21,7 +21,7 @@ class Config
     this()
     {
         sound_file_name = SOUND_FNAME;
-        play_sound = false;
+        play_sound = true;
     }
 
     Config SetApis()

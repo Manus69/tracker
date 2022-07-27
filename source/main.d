@@ -3,27 +3,25 @@ module main;
 import std.stdio;
 
 import constants;
-import input;
-import token;
-import parse;
-import kuck;
 import config;
 import startup;
 import run;
+import output;
 
-//McMains and Mullins
 void main(string[] args)
 {
 	Config config;
-
-
-	// string[string][string] table;
-	// table["ass"]["cock"] = "penis";
-
-	// writeln(table["ass"]["cock"]);
 	
-	args = ["ass", "--file=test_file.txt"];
-	config = GetConfig(args);
+	// args = ["ass", "--file=test_file.txt"];
+	try
+	{
+		config = GetConfig(args);
+	}
+	catch (Exception ex)
+	{
+		stderr.writeln(ex.msg);
+		return DisplayHelp();
+	}
 
 	Run(config);
 }
